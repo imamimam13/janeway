@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  janeway-web:
+    image: ghcr.io/imamimam13/janeway:latest
+    container_name: janeway-web
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persistent volumes on CasaOS host (defaults to standard /DATA/AppData/janeway)
+      - /DATA/AppData/janeway/media:/vol/janeway/src/media
+      - /DATA/AppData/janeway/db:/db
+      - /DATA/AppData/janeway/logs:/vol/janeway/logs
+    environment:
+      # Database Settings
+      - DB_VENDOR=postgres          # Set to 'sqlite' if you don't want a separate database service
+      - DB_HOST=janeway-db
+      - DB_PORT=5432
+      - DB_NAME=janeway
+      - DB_USER=janeway
+      - DB_PASSWORD=janeway_password_change_me
+      
+      # Default Press & Journal Settings (Used on first container startup to initialize Janeway)
+      - JANEWAY_PRESS_NAME=My Press
+      - JANEWAY_PRESS_DOMAIN=localhost
+      - JANEWAY_PRESS_CONTACT=admin@example.com
+      - JANEWAY_JOURNAL_CODE=journal
+      - JANEWAY_JOURNAL_NAME=My Journal
+      
+      # Default Django Admin Superuser (Automatically created if it doesn't exist)
+      - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_EMAIL=admin@example.com
+      - DJANGO_SUPERUSER_PASSWORD=admin_password_change_me
+    depends_on:
+      - janeway-db
+    x-casaos:
+      ports:
+        - container: "8000"
+          description:
+            en_US: "Janeway HTTP Port"
+            id_ID: "Port HTTP Janeway"
+      volumes:
+        - container: "/vol/janeway/src/media"
+          description:
+            en_US: "Media directory (Uploads, article files, PDFs)"
+            id_ID: "Direktori media (File upload, artikel, file PDF)"
+        - container: "/db"
+          description:
+            en_US: "SQLite database storage (used only if DB_VENDOR=sqlite)"
+            id_ID: "Penyimpanan database SQLite (hanya dipakai jika DB_VENDOR=sqlite)"
+        - container: "/vol/janeway/logs"
+          description:
+            en_US: "Application logs"
+            id_ID: "Log aplikasi"
+
+  janeway-db:
+    image: postgres:15-alpine
+    container_name: janeway-db
+    restart: unless-stopped
+    volumes:
+      - /DATA/AppData/janeway/postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=janeway
+      - POSTGRES_USER=janeway
+      - POSTGRES_PASSWORD=janeway_password_change_me
+    x-casaos:
+      volumes:
+        - container: "/var/lib/postgresql/data"
+          description:
+            en_US: "PostgreSQL Database Data"
+            id_ID: "Data Database PostgreSQL"
+
+x-casaos:
+  author: "imamimam13"
+  category: "Publishing"
+  icon: "https://raw.githubusercontent.com/openlibhums/janeway/master/docs/_static/logo.png"
+  title:
+    en_US: "Janeway"
+    id_ID: "Janeway"
+  description:
+    en_US: "Janeway is a digital platform for publishing scholarly journals, developed by the Open Library of Humanities. Automatically dockerized for CasaOS."
+    id_ID: "Janeway adalah platform digital untuk menerbitkan jurnal ilmiah, dikembangkan oleh Open Library of Humanities. Didockerisasi secara otomatis untuk CasaOS."
+  main: "janeway-web"
+  port_map: "8000"
