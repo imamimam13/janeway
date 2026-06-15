@@ -47,6 +47,10 @@ if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ] &&
     fi
 fi
 
+# Build theme assets
+echo "Building theme assets..."
+python3 src/manage.py build_assets
+
 # Collect static files
 echo "Collecting static files..."
 python3 src/manage.py collectstatic --noinput
