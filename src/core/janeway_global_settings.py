@@ -46,6 +46,15 @@ COMMAND = sys.argv[1:]
 IN_TEST_RUNNER = COMMAND[:1] == ["test"]
 ALLOWED_HOSTS = ["*"]
 
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    "CSRF_TRUSTED_ORIGINS",
+    "http://localhost,https://localhost"
+).split(",")
+if os.environ.get("JANEWAY_PRESS_DOMAIN"):
+    press_domain = os.environ["JANEWAY_PRESS_DOMAIN"]
+    CSRF_TRUSTED_ORIGINS.extend([f"http://{press_domain}", f"https://{press_domain}"])
+
+
 FILE_UPLOAD_PERMISSIONS = 0o644
 
 # Application definition
