@@ -45,7 +45,7 @@ RUN find "/vol/janeway/src/plugins/" -print -iname "*requirements.txt" -exec pip
 RUN if [ -n "$(ls -A ./lib 2>/dev/null)" ]; then pip3 install -e lib/*; fi || true
 
 # Setup settings.py if not present
-RUN cp src/core/janeway_global_settings.py src/core/settings.py
+RUN echo "# Empty settings for Docker" > src/core/settings.py
 
 # Create directory for sqlite database and logs
 RUN mkdir -p /db /vol/janeway/logs /vol/janeway/src/media /vol/janeway/src/collected-static
