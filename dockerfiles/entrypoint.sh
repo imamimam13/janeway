@@ -47,6 +47,10 @@ if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ] &&
     fi
 fi
 
+# Collect static files
+echo "Collecting static files..."
+python3 src/manage.py collectstatic --noinput
+
 # Execute CMD
 echo "Starting Janeway..."
 exec "$@"
